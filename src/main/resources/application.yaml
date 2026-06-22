@@ -1,3 +1,6 @@
 spring:
   application:
     name: joke-teller
+
+openai:
+  api-key: ADD_KEY
