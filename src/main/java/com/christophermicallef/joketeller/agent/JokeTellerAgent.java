@@ -4,6 +4,8 @@ import com.christophermicallef.joketeller.enums.SuggestJokeCategory;
 import com.openai.client.OpenAIClient;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class JokeTellerAgent {
+
+    private static final Logger log = LoggerFactory.getLogger(JokeTellerAgent.class);
 
     private static final String SYSTEM_PROMPT = """
             You are Chuckles, an upbeat stand-up comedian agent.
@@ -30,6 +34,7 @@ public class JokeTellerAgent {
     }
 
     public String tellJoke(String userMessage) {
+        log.info("Called [tellJoke: {}]", userMessage);
         ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
                 .model(ChatModel.GPT_4O_MINI)
                 .maxCompletionTokens(300)
@@ -38,6 +43,7 @@ public class JokeTellerAgent {
                 .addUserMessage(userMessage);
 
         for (int round = 0; round < MAX_TOOL_ROUNDS; round++) {
+            log.debug("Executing round [round: {}]", round);
             ChatCompletion completion = client.chat().completions().create(paramsBuilder.build());
             ChatCompletionMessage message = completion.choices().getFirst().message();
             paramsBuilder.addMessage(message);
@@ -60,6 +66,7 @@ public class JokeTellerAgent {
     }
 
     private Object runTool(ChatCompletionMessageFunctionToolCall function) {
+        log.debug("Executing runTool");
         if ("SuggestJokeCategory".equals(function.function().name())) {
             return function.function().arguments(SuggestJokeCategory.class).execute();
         }

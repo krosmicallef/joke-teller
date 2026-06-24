@@ -4,3 +4,7 @@ spring:
 
 openai:
   api-key: ADD_KEY
+
+logging:
+  level:
+    com.christophermicallef: DEBUG
