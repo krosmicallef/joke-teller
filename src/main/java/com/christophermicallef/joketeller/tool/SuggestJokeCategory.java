@@ -1,4 +1,4 @@
-package com.christophermicallef.joketeller.enums;
+package com.christophermicallef.joketeller.tool;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;

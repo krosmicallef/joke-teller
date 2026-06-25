@@ -1,6 +1,6 @@
 package com.christophermicallef.joketeller.agent;
 
-import com.christophermicallef.joketeller.enums.SuggestJokeCategory;
+import com.christophermicallef.joketeller.tool.SuggestJokeCategory;
 import com.openai.client.OpenAIClient;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.*;
