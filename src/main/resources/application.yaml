@@ -2,6 +2,20 @@ spring:
   application:
     name: joke-teller
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/mydb
+    username: user
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
 openai:
   api-key: ADD_KEY
 
