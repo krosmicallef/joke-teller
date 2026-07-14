@@ -11,10 +11,19 @@ mvn clean install
 java -jar ./target/joke-teller-0.0.1-SNAPSHOT.jar
 ```
 ## Docker
+
+To create your application image and run with a provided MySQL:
+
 ```bash
 docker build -t joke-teller .
 
 docker run -p 8080:8080 joke-teller
+```
+
+To run your application and MySQL as docker containers:
+
+```bash
+docker compose up
 ```
 
 ## Configuration
@@ -23,8 +32,22 @@ spring:
   application:
     name: joke-teller
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/mydb
+    username: user
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
 openai:
-  api-key: ADD_KEY
+  api-key: ADD_YOUR_OPEN_AI_API_KEY
 
 logging:
   level:

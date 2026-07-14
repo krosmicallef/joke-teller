@@ -1,6 +1,7 @@
 package com.christophermicallef.joketeller.controller;
 
 import com.christophermicallef.joketeller.service.JokeTellerService;
+import com.christophermicallef.joketeller.service.RiddleTellerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,11 +21,13 @@ class JokeTellerControllerTest {
 
     @Mock
     private JokeTellerService jokeTellerService;
+    @Mock
+    private RiddleTellerService riddleTellerService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        JokeTellerController controller = new JokeTellerController(jokeTellerService);
+        JokeTellerController controller = new JokeTellerController(jokeTellerService, riddleTellerService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

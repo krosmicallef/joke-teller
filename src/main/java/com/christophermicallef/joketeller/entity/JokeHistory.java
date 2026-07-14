@@ -1,6 +1,8 @@
 package com.christophermicallef.joketeller.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +17,8 @@ public class JokeHistory {
     @Column(nullable = false)
     private LocalDateTime created;
 
-    @Column(length = 45)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(nullable = false)
     private String joke;
 
     public JokeHistory() {

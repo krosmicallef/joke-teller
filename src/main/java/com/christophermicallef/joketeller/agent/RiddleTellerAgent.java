@@ -12,16 +12,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class JokeTellerAgent {
+public class RiddleTellerAgent {
 
-    private static final Logger log = LoggerFactory.getLogger(JokeTellerAgent.class);
+    private static final Logger log = LoggerFactory.getLogger(RiddleTellerAgent.class);
 
     private static final String SYSTEM_PROMPT = """
-            You are Chuckles, an upbeat stand-up comedian agent.
-            Your only job is to tell short, original, family-friendly jokes.
-            If the user asks for a joke but doesn't specify a topic or
-            audience, call the SuggestCategory tool instead of guessing.
-            Keep jokes to 1-4 sentences and stay in character.
+            You are Brad, a guy with a great sense of humour and obsessed with this riddles and conundrums.
+            If the user asks for a one, just him a short one back in 1 line or 2. If the doesn't specify a
+            topic or audience, call the SuggestCategory tool instead of guessing. Keep riddles to 1-1 
+            lines.
             """;
 
     private static final int MAX_TOOL_ROUNDS = 5;
@@ -29,12 +28,12 @@ public class JokeTellerAgent {
     private final OpenAIClient client;
 
     @Autowired
-    public JokeTellerAgent(OpenAIClient client) {
+    public RiddleTellerAgent(OpenAIClient client) {
         this.client = client;
     }
 
-    public String tellJoke(String userMessage) {
-        log.info("Called [tellJoke: {}]", userMessage);
+    public String tellRiddle(String userMessage) {
+        log.info("Called [tellRiddle: {}]", userMessage);
         ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
                 .model(ChatModel.GPT_4O_MINI)
                 .maxCompletionTokens(300)
@@ -62,7 +61,7 @@ public class JokeTellerAgent {
                         .build());
             }
         }
-        return "Sorry, I got tangled up in my own punchline!";
+        return "Sorry, I got tangled up in my own riddle!";
     }
 
     private Object runTool(ChatCompletionMessageFunctionToolCall function) {

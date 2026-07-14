@@ -11,13 +11,13 @@ import java.util.concurrent.ThreadLocalRandom;
  * that decision-making is what makes JokeTellerAgent an agent rather than a
  * plain prompt-in/text-out wrapper.
  *
- * The SDK derives the function name from the class name ("SuggestJokeCategory")
+ * The SDK derives the function name from the class name ("SuggestCategory")
  * and its JSON schema from the public fields below.
  */
 @JsonClassDescription(
         "Suggests a joke category appropriate for the requested audience. "
                 + "Call this when the user asks for a joke without specifying a topic.")
-public class SuggestJokeCategory {
+public class SuggestCategory {
 
     @JsonPropertyDescription("Who the joke is for: \"kids\", \"adults\", or \"general\".")
     public String audience;
