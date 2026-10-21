@@ -1,8 +1,10 @@
 package com.christophermicallef.joketeller.controller;
 
+import com.christophermicallef.joketeller.entity.JokeHistory;
 import com.christophermicallef.joketeller.service.JokeTellerService;
 import com.christophermicallef.joketeller.service.RiddleTellerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +30,13 @@ public class JokeTellerController {
     @GetMapping("/jokes")
     public String tellJoke(@RequestParam(defaultValue = "Tell me a joke") String prompt) {
         return jokeTellerService.tellJoke(prompt);
+    }
+
+    @GetMapping("/jokes/random")
+    public ResponseEntity<JokeHistory> tellRandomJoke() {
+        return jokeTellerService.tellRandomJoke()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/riddles")

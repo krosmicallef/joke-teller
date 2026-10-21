@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class JokeTellerService {
 
@@ -45,7 +47,11 @@ public class JokeTellerService {
         }
     }
 
+    public Optional<JokeHistory> tellRandomJoke() {
+        return jokeHistoryRepository.findRandom();
+    }
+
     private String fallbackJoke() {
-        return "ha ha";
+        return jokeHistoryRepository.findRandom().map(JokeHistory::getJoke).orElse("ha ha");
     }
 }
