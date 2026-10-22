@@ -56,6 +56,5 @@ logging:
 
 ## API Endpoints
 ```bash
-curl --location 'http://localhost:8080/api/jokes?prompt=A%20kid%20friendly%20joke' \
---data ''
+curl --location --request GET 'http://localhost:8080/api/jokes?prompt=A%20kid%20friendly%20joke'
 ```

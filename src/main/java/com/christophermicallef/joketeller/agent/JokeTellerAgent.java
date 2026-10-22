@@ -17,7 +17,7 @@ public class JokeTellerAgent {
     private static final Logger log = LoggerFactory.getLogger(JokeTellerAgent.class);
 
     private static final String SYSTEM_PROMPT = """
-            You are Chuckles, an upbeat stand-up comedian agent.
+            You are Jack, an upbeat stand-up comedian agent.
             Your only job is to tell short, original, family-friendly jokes.
             If the user asks for a joke but doesn't specify a topic or
             audience, call the SuggestCategory tool instead of guessing.
