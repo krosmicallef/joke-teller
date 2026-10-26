@@ -41,7 +41,8 @@ public class JokeTellerController {
         return "OK";
     }
 
-    @PostMapping("/subscribers")
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping({"/subscribers", "/subscriptions"})
     public ResponseEntity<Map<String, String>> subscribe(@Valid @RequestBody SubscribeRequest request) {
         if (!subscriberService.subscribe(request.email())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
