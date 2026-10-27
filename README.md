@@ -8,7 +8,7 @@ joke should be for kids or adults.
 ```bash
 mvn clean install
 
-java -jar ./target/joke-teller-0.0.1-SNAPSHOT.jar
+java -jar ./joke-teller-app/target/joke-teller-0.0.1-SNAPSHOT.jar
 ```
 ## Docker
 
