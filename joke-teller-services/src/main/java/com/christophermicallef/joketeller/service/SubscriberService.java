@@ -25,7 +25,8 @@ public class SubscriberService {
         try {
             subscriberRepository.saveAndFlush(new Subscriber(normalizedEmail));
             return true;
-        } catch (DataIntegrityViolationException exception) {
+        }
+        catch (DataIntegrityViolationException exception) {
             // The unique database constraint handles two concurrent requests for the same email.
             if (subscriberRepository.existsByEmail(normalizedEmail)) {
                 return false;

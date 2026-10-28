@@ -30,7 +30,8 @@ public class JokeTellerService {
         try {
             result = jokeTellerAgent.tellJoke(userMessage);
             saveToRepo(result);
-        } catch (OpenAIException ex) {
+        }
+        catch (OpenAIException ex) {
             log.warn("Failed to generate joke, falling back", ex);
             result = fallbackJoke();
         }

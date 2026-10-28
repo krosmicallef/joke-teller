@@ -17,6 +17,7 @@
 		<java.version>25</java.version>
 	</properties>
 	<modules>
+		<module>joke-teller-services</module>
 		<module>joke-teller-app</module>
 		<module>joke-teller-sender</module>
 	</modules>
