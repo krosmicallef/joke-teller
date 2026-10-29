@@ -2,6 +2,12 @@ spring:
   application:
     name: joke-teller-sender
 
+sender:
+  schedule:
+    # Spring cron format: second minute hour day-of-month month day-of-week.
+    # Runs daily at midnight by default.
+    cron: "0 * * * * *"
+
   datasource:
     url: jdbc:mysql://localhost:3306/mydb
     username: user

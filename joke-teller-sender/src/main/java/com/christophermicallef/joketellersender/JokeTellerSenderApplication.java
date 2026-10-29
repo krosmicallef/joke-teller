@@ -6,8 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = "com.christophermicallef.joketeller")
+@EnableScheduling
 @EntityScan("com.christophermicallef.joketeller.entity")
 @EnableJpaRepositories("com.christophermicallef.joketeller.repository")
 public class JokeTellerSenderApplication implements CommandLineRunner {
