@@ -1,4 +1,4 @@
-package com.christophermicallef.joketeller.config;
+package com.christophermicallef.joketeller.services.config;
 
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;

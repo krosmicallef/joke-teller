@@ -1,6 +1,6 @@
-package com.christophermicallef.joketeller.service;
+package com.christophermicallef.joketeller.services.service;
 
-import com.christophermicallef.joketeller.agent.RiddleTellerAgent;
+import com.christophermicallef.joketeller.services.agent.RiddleTellerAgent;
 import com.openai.errors.OpenAIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

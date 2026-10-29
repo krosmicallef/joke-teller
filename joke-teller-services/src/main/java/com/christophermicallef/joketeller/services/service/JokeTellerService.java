@@ -1,8 +1,8 @@
-package com.christophermicallef.joketeller.service;
+package com.christophermicallef.joketeller.services.service;
 
-import com.christophermicallef.joketeller.agent.JokeTellerAgent;
-import com.christophermicallef.joketeller.entity.JokeHistory;
-import com.christophermicallef.joketeller.repository.JokeHistoryRepository;
+import com.christophermicallef.joketeller.services.agent.JokeTellerAgent;
+import com.christophermicallef.joketeller.services.entity.JokeHistory;
+import com.christophermicallef.joketeller.services.repository.JokeHistoryRepository;
 import com.openai.errors.OpenAIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

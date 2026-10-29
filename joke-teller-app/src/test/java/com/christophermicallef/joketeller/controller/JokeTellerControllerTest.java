@@ -1,8 +1,8 @@
 package com.christophermicallef.joketeller.controller;
 
-import com.christophermicallef.joketeller.service.JokeTellerService;
-import com.christophermicallef.joketeller.service.RiddleTellerService;
-import com.christophermicallef.joketeller.service.SubscriberService;
+import com.christophermicallef.joketeller.services.service.JokeTellerService;
+import com.christophermicallef.joketeller.services.service.RiddleTellerService;
+import com.christophermicallef.joketeller.services.service.SubscriberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

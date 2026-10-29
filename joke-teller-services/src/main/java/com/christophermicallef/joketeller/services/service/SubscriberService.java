@@ -1,7 +1,7 @@
-package com.christophermicallef.joketeller.service;
+package com.christophermicallef.joketeller.services.service;
 
-import com.christophermicallef.joketeller.entity.Subscriber;
-import com.christophermicallef.joketeller.repository.SubscriberRepository;
+import com.christophermicallef.joketeller.services.entity.Subscriber;
+import com.christophermicallef.joketeller.services.repository.SubscriberRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 

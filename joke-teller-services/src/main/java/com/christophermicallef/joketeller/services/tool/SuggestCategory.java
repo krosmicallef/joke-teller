@@ -1,4 +1,4 @@
-package com.christophermicallef.joketeller.tool;
+package com.christophermicallef.joketeller.services.tool;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;

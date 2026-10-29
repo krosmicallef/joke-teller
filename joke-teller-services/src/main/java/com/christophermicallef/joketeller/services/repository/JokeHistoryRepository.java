@@ -1,6 +1,6 @@
-package com.christophermicallef.joketeller.repository;
+package com.christophermicallef.joketeller.services.repository;
 
-import com.christophermicallef.joketeller.entity.JokeHistory;
+import com.christophermicallef.joketeller.services.entity.JokeHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

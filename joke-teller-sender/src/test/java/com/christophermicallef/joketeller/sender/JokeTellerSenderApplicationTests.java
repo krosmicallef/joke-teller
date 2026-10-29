@@ -1,4 +1,4 @@
-package com.christophermicallef.joketellersender;
+package com.christophermicallef.joketeller.sender;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

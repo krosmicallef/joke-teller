@@ -1,9 +1,9 @@
 package com.christophermicallef.joketeller.controller;
 
-import com.christophermicallef.joketeller.entity.JokeHistory;
-import com.christophermicallef.joketeller.service.JokeTellerService;
-import com.christophermicallef.joketeller.service.RiddleTellerService;
-import com.christophermicallef.joketeller.service.SubscriberService;
+import com.christophermicallef.joketeller.services.entity.JokeHistory;
+import com.christophermicallef.joketeller.services.service.JokeTellerService;
+import com.christophermicallef.joketeller.services.service.RiddleTellerService;
+import com.christophermicallef.joketeller.services.service.SubscriberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

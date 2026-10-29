@@ -1,4 +1,4 @@
-package com.christophermicallef.joketeller.entity;
+package com.christophermicallef.joketeller.services.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
