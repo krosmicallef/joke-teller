@@ -3,6 +3,8 @@ package com.christophermicallef.joketeller.services.service;
 import com.christophermicallef.joketeller.services.entity.Subscriber;
 import com.christophermicallef.joketeller.services.repository.SubscriberRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
@@ -33,5 +35,9 @@ public class SubscriberService {
             }
             throw exception;
         }
+    }
+
+    public Page<Subscriber> findSubscribers(Pageable pageable) {
+        return subscriberRepository.findAll(pageable);
     }
 }
