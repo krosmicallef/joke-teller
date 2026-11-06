@@ -7,6 +7,7 @@ import com.christophermicallef.joketeller.services.service.SubscriberService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,13 +19,19 @@ public class JokeSendingTask {
 	private static final Logger logger = LoggerFactory.getLogger(JokeSendingTask.class);
 	private final SubscriberService subscriberService;
 	private final JokeTellerService jokeTellerService;
+	private final KafkaTemplate<String, JokeMessage> kafkaTemplate;
+	private final String topic;
 	private final int pageSize;
 
 	public JokeSendingTask(SubscriberService subscriberService,
 			JokeTellerService jokeTellerService,
+			KafkaTemplate<String, JokeMessage> kafkaTemplate,
+			@Value("${sender.kafka.topic:jokes}") String topic,
 			@Value("${sender.page-size:100}") int pageSize) {
 		this.subscriberService = subscriberService;
 		this.jokeTellerService = jokeTellerService;
+		this.kafkaTemplate = kafkaTemplate;
+		this.topic = topic;
 		this.pageSize = pageSize;
 	}
 
@@ -41,7 +48,9 @@ public class JokeSendingTask {
 		do {
 			page = subscriberService.findSubscribers(PageRequest.of(pageNumber, pageSize));
 			for (Subscriber subscriber : page.getContent()) {
-				logger.info("Would send joke to {}: {}", subscriber.getEmail(), joke.getJoke());
+				JokeMessage message = new JokeMessage(subscriber.getEmail(), joke.getJoke());
+				kafkaTemplate.send(topic, subscriber.getEmail(), message);
+				logger.info("Queued joke message for {}", subscriber.getEmail());
 			}
 			pageNumber++;
 		} while (!page.isLast());
