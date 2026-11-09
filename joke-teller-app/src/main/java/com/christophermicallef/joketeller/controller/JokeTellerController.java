@@ -53,6 +53,16 @@ public class JokeTellerController {
                 .body(Map.of("code", "SUBSCRIBED", "message", "Successfully subscribed"));
     }
 
+    @PostMapping("/subscribers/verify")
+    public ResponseEntity<Map<String, String>> verifySubscriber(@Valid @RequestBody VerifySubscriberRequest request) {
+        if (!subscriberService.verifySubscriber(request.email(), request.code())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("code", "INVALID_OR_EXPIRED_CODE", "message", "Verification code is invalid or expired"));
+        }
+
+        return ResponseEntity.ok(Map.of("code", "VERIFIED", "message", "Email address verified"));
+    }
+
     @GetMapping("/jokes")
     public String tellJoke(@RequestParam(defaultValue = "Tell me a joke") String prompt) {
         return jokeTellerService.tellJoke(prompt);
