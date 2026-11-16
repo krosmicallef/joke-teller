@@ -26,3 +26,11 @@ openai:
 logging:
   level:
     com.christophermicallef: DEBUG
+
+admin:
+  jwt:
+    secret: ${ADMIN_JWT_SECRET:vN8qL2xR5mT9pK3wY7cF1aH6dS4jB0zG}
+    lifetime-seconds: ${ADMIN_JWT_LIFETIME_SECONDS:1800}
+  bootstrap:
+    username: ${ADMIN_BOOTSTRAP_USERNAME:admin}
+    password: ${ADMIN_BOOTSTRAP_PASSWORD:password123}
