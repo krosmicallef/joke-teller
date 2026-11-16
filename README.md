@@ -58,3 +58,18 @@ logging:
 ```bash
 curl --location --request GET 'http://localhost:8080/api/jokes?prompt=A%20kid%20friendly%20joke'
 ```
+
+
+## Admin access
+
+Admin endpoints live under `/api/admin/**`. The login endpoint is `POST /api/admin/auth/login`; the remaining admin endpoints require `Authorization: Bearer <token>`. Tokens are signed with HS256 and expire after 30 minutes by default. Configure a secret of at least 32 characters with `ADMIN_JWT_SECRET` before using login. Set `ADMIN_JWT_LIFETIME_SECONDS` to change the lifetime.
+
+The Flyway migration `V3__create_admin_user_table.sql` creates the admin user table. To provision the first account, set `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD` when starting the app. The password is stored as a salted PBKDF2 hash. Bootstrap is insert-only: it does not replace an existing account's password. After login, administrators can list or create accounts through `GET` and `POST /api/admin/users`; newly created passwords must be at least 12 characters. These endpoints never return password hashes.
+
+Login request:
+
+```json
+{"username":"admin","password":"your-password"}
+```
+
+A successful response includes `token`, `tokenType` (`Bearer`), and `expiresIn` in seconds. `GET /api/admin/me` is a protected endpoint that can be used to confirm the token is valid.
