@@ -1,5 +1,6 @@
 package com.christophermicallef.joketeller.security;
 
+import com.christophermicallef.joketeller.services.entity.AdminUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,11 +25,13 @@ public class JwtTokenService {
         this.lifetimeSeconds = lifetimeSeconds;
     }
 
-    public String createToken(String username) {
+    public String createToken(AdminUser user) {
         requireSecret();
         long now = Instant.now().getEpochSecond();
         try {
-            byte[] claims = objectMapper.writeValueAsBytes(Map.of("sub", username, "iat", now, "exp", now + lifetimeSeconds));
+            byte[] claims = objectMapper.writeValueAsBytes(Map.of(
+                    "sub", user.getUsername(), "uid", user.getId(), "ver", user.getTokenVersion(),
+                    "iat", now, "exp", now + lifetimeSeconds));
             String unsigned = HEADER + "." + Base64.getUrlEncoder().withoutPadding().encodeToString(claims);
             return unsigned + "." + Base64.getUrlEncoder().withoutPadding().encodeToString(sign(unsigned));
         } catch (Exception ex) {
@@ -36,7 +39,7 @@ public class JwtTokenService {
         }
     }
 
-    public Optional<String> getUsername(String token) {
+    public Optional<TokenClaims> getClaims(String token) {
         try {
             requireSecret();
             String[] parts = token.split("\\.", -1);
@@ -46,10 +49,15 @@ public class JwtTokenService {
             if (!java.security.MessageDigest.isEqual(sign(unsigned), actual)) return Optional.empty();
             Map<?, ?> claims = objectMapper.readValue(Base64.getUrlDecoder().decode(parts[1]), Map.class);
             Object subject = claims.get("sub");
+            Object userId = claims.get("uid");
+            Object version = claims.get("ver");
             Object expiresAt = claims.get("exp");
-            if (!(subject instanceof String username) || !(expiresAt instanceof Number expiry)
-                    || expiry.longValue() <= Instant.now().getEpochSecond()) return Optional.empty();
-            return Optional.of(username);
+            if (!(subject instanceof String username) || !(userId instanceof Number uid)
+                    || !(version instanceof Number ver) || !(expiresAt instanceof Number expiry)
+                    || uid.longValue() <= 0 || expiry.longValue() <= Instant.now().getEpochSecond()) {
+                return Optional.empty();
+            }
+            return Optional.of(new TokenClaims(uid.longValue(), username, ver.intValue(), expiry.longValue()));
         } catch (Exception ex) {
             return Optional.empty();
         }
@@ -69,4 +77,6 @@ public class JwtTokenService {
         if (secret.length < 32) throw new IllegalStateException("ADMIN_JWT_SECRET must contain at least 32 characters");
         if (lifetimeSeconds <= 0) throw new IllegalStateException("admin.jwt.lifetime-seconds must be positive");
     }
+
+    public record TokenClaims(long userId, String username, int tokenVersion, long expiresAt) { }
 }

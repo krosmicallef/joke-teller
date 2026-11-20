@@ -1,5 +1,6 @@
 package com.christophermicallef.joketeller.security;
 
+import com.christophermicallef.joketeller.services.service.AdminUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -10,9 +11,14 @@ import java.io.IOException;
 @Component
 public class AdminJwtInterceptor implements HandlerInterceptor {
     public static final String AUTHENTICATED_USERNAME = AdminJwtInterceptor.class.getName() + ".username";
+    public static final String AUTHENTICATED_USER_ID = AdminJwtInterceptor.class.getName() + ".userId";
     private final JwtTokenService tokens;
+    private final AdminUserService users;
 
-    public AdminJwtInterceptor(JwtTokenService tokens) { this.tokens = tokens; }
+    public AdminJwtInterceptor(JwtTokenService tokens, AdminUserService users) {
+        this.tokens = tokens;
+        this.users = users;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
@@ -20,10 +26,14 @@ public class AdminJwtInterceptor implements HandlerInterceptor {
 
         String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Bearer ")) {
-            var username = tokens.getUsername(authorization.substring(7).trim());
-            if (username.isPresent()) {
-                request.setAttribute(AUTHENTICATED_USERNAME, username.get());
-                return true;
+            var claims = tokens.getClaims(authorization.substring(7).trim());
+            if (claims.isPresent()) {
+                var user = users.findActiveTokenUser(claims.get().userId(), claims.get().tokenVersion());
+                if (user.isPresent()) {
+                    request.setAttribute(AUTHENTICATED_USERNAME, user.get().getUsername());
+                    request.setAttribute(AUTHENTICATED_USER_ID, user.get().getId());
+                    return true;
+                }
             }
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

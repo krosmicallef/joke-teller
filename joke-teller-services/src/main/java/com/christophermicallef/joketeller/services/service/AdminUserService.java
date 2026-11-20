@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -25,10 +26,8 @@ public class AdminUserService {
         return repository.findByUsername(username).filter(user -> verify(password, user.getPasswordHash()));
     }
 
-    @Transactional
-    public AdminUser create(String username, String password) {
-        if (repository.existsByUsername(username)) throw new IllegalArgumentException("Username is already in use");
-        return repository.save(new AdminUser(username, hash(password)));
+    public Optional<AdminUser> findActiveTokenUser(long userId, int tokenVersion) {
+        return repository.findById(userId).filter(user -> user.getTokenVersion() == tokenVersion);
     }
 
     @Transactional
@@ -37,6 +36,42 @@ public class AdminUserService {
                 && !repository.existsByUsername(username)) {
             repository.save(new AdminUser(username, hash(password)));
         }
+    }
+
+    @Transactional
+    public AdminUser create(String username, String password) {
+        if (repository.existsByUsername(username)) throw new IllegalStateException("Username is already in use");
+        return repository.save(new AdminUser(username, hash(password)));
+    }
+
+    @Transactional
+    public AdminUser update(long id, String username, String password) {
+        AdminUser user = repository.findById(id).orElseThrow(() -> new NoSuchElementException("Admin user not found"));
+        String normalizedUsername = username == null ? null : username.trim();
+        if (normalizedUsername != null) {
+            if (normalizedUsername.isBlank()) throw new IllegalArgumentException("Username cannot be blank");
+            repository.findByUsername(normalizedUsername)
+                    .filter(existing -> !existing.getId().equals(id))
+                    .ifPresent(existing -> { throw new IllegalStateException("Username is already in use"); });
+        }
+        if (normalizedUsername == null && password == null) {
+            throw new IllegalArgumentException("Provide a username or a new password");
+        }
+        user.updateProfile(normalizedUsername, password == null ? null : hash(password));
+        return user;
+    }
+
+    @Transactional
+    public void delete(long id) {
+        AdminUser user = repository.findById(id).orElseThrow(() -> new NoSuchElementException("Admin user not found"));
+        if (repository.count() <= 1) throw new IllegalStateException("The last admin user cannot be deleted");
+        repository.delete(user);
+    }
+
+    @Transactional
+    public void invalidateTokens(long id) {
+        AdminUser user = repository.findById(id).orElseThrow(() -> new NoSuchElementException("Admin user not found"));
+        user.invalidateTokens();
     }
 
     public List<AdminUser> findAll() { return repository.findAll(); }

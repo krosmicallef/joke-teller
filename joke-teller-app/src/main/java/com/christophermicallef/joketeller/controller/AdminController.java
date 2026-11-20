@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -30,11 +31,17 @@ public class AdminController {
     public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request) {
         return users.authenticate(request.username(), request.password())
                 .<ResponseEntity<?>>map(user -> ResponseEntity.ok(Map.of(
-                        "token", tokens.createToken(user.getUsername()),
+                        "token", tokens.createToken(user),
                         "tokenType", "Bearer",
                         "expiresIn", tokens.getLifetimeSeconds())))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Invalid username or password")));
+    }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        users.invalidateTokens((Long) request.getAttribute(AdminJwtInterceptor.AUTHENTICATED_USER_ID));
+        return ResponseEntity.ok(Map.of("message", "Logged out; the access token is no longer valid"));
     }
 
     @GetMapping("/users")
@@ -45,7 +52,32 @@ public class AdminController {
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateAdminUserRequest request) {
         try { return ResponseEntity.status(HttpStatus.CREATED).body(AdminUserSummary.from(users.create(request.username(), request.password()))); }
-        catch (IllegalArgumentException ex) { return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage())); }
+        catch (IllegalStateException ex) { return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage())); }
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable long id, @Valid @RequestBody UpdateAdminUserRequest request) {
+        try {
+            return ResponseEntity.ok(AdminUserSummary.from(users.update(id, request.username(), request.password())));
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+        try {
+            users.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+        }
     }
 
     @GetMapping("/me")
