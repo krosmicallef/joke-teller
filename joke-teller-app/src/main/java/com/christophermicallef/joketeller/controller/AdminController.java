@@ -3,7 +3,9 @@ package com.christophermicallef.joketeller.controller;
 import com.christophermicallef.joketeller.security.AdminJwtInterceptor;
 import com.christophermicallef.joketeller.security.JwtTokenService;
 import com.christophermicallef.joketeller.services.entity.AdminUser;
+import com.christophermicallef.joketeller.services.entity.Subscriber;
 import com.christophermicallef.joketeller.services.service.AdminUserService;
+import com.christophermicallef.joketeller.services.service.SubscriberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -21,10 +25,12 @@ import java.util.NoSuchElementException;
 public class AdminController {
     private final AdminUserService users;
     private final JwtTokenService tokens;
+    private final SubscriberService subscribers;
 
-    public AdminController(AdminUserService users, JwtTokenService tokens) {
+    public AdminController(AdminUserService users, JwtTokenService tokens, SubscriberService subscribers) {
         this.users = users;
         this.tokens = tokens;
+        this.subscribers = subscribers;
     }
 
     @PostMapping("/auth/login")
@@ -80,6 +86,49 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/subscriptions")
+    public Page<SubscriptionSummary> listSubscriptions(Pageable pageable) {
+        return subscribers.findSubscribers(pageable).map(SubscriptionSummary::from);
+    }
+
+    @PostMapping("/subscriptions")
+    public ResponseEntity<?> createSubscription(@Valid @RequestBody SubscribeRequest request) {
+        try {
+            if (!subscribers.subscribe(request.email())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("error", "Email is already subscribed"));
+            }
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("message", "Subscription created"));
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Email is already subscribed"));
+        }
+    }
+
+    @PutMapping("/subscriptions/{id}")
+    public ResponseEntity<?> updateSubscription(@PathVariable int id,
+                                               @Valid @RequestBody UpdateSubscriptionRequest request) {
+        try {
+            return ResponseEntity.ok(SubscriptionSummary.from(
+                    subscribers.updateSubscriber(id, request.email(), request.verified())));
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/subscriptions/{id}")
+    public ResponseEntity<?> deleteSubscription(@PathVariable int id) {
+        try {
+            subscribers.deleteSubscriber(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @GetMapping("/me")
     public Map<String, String> currentUser(HttpServletRequest request) {
         return Map.of("username", (String) request.getAttribute(AdminJwtInterceptor.AUTHENTICATED_USERNAME));
@@ -88,6 +137,12 @@ public class AdminController {
     public record AdminUserSummary(Long id, String username, LocalDateTime createdAt, LocalDateTime updatedAt) {
         static AdminUserSummary from(AdminUser user) {
             return new AdminUserSummary(user.getId(), user.getUsername(), user.getCreatedAt(), user.getUpdatedAt());
+        }
+    }
+
+    public record SubscriptionSummary(Integer id, String email, boolean verified) {
+        static SubscriptionSummary from(Subscriber subscriber) {
+            return new SubscriptionSummary(subscriber.getId(), subscriber.getEmail(), subscriber.isVerified());
         }
     }
 }

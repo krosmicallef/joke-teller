@@ -41,6 +41,22 @@ public class Subscriber {
     public String getEmail() { return email; }
     public boolean isVerified() { return verified; }
 
+    public void update(String email, Boolean verified) {
+        if (!this.email.equals(email)) {
+            this.verified = false;
+            this.verificationCode = null;
+            this.verificationExpiresAt = null;
+        }
+        this.email = email;
+        if (verified != null) {
+            this.verified = verified;
+            if (verified) {
+                this.verificationCode = null;
+                this.verificationExpiresAt = null;
+            }
+        }
+    }
+
     public boolean verify(String code, LocalDateTime now) {
         if (verified || verificationCode == null || verificationExpiresAt == null
                 || !now.isBefore(verificationExpiresAt) || !verificationCode.equals(code)) {

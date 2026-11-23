@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 @Service
 public class SubscriberService {
@@ -59,5 +60,24 @@ public class SubscriberService {
 
     public Page<Subscriber> findSubscribers(Pageable pageable) {
         return subscriberRepository.findAll(pageable);
+    }
+
+    @Transactional
+    public Subscriber updateSubscriber(int id, String email, Boolean verified) {
+        Subscriber subscriber = subscriberRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        subscriberRepository.findByEmail(normalizedEmail)
+                .filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> { throw new IllegalStateException("Email is already subscribed"); });
+        subscriber.update(normalizedEmail, verified);
+        return subscriber;
+    }
+
+    @Transactional
+    public void deleteSubscriber(int id) {
+        Subscriber subscriber = subscriberRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+        subscriberRepository.delete(subscriber);
     }
 }
