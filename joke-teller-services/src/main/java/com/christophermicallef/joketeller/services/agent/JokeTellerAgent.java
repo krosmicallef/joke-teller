@@ -2,6 +2,7 @@ package com.christophermicallef.joketeller.services.agent;
 
 import com.christophermicallef.joketeller.services.tool.SuggestCategory;
 import com.openai.client.OpenAIClient;
+import com.openai.core.JsonValue;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.*;
 import org.slf4j.Logger;
@@ -36,10 +37,14 @@ public class JokeTellerAgent {
     public String tellJoke(String userMessage) {
         log.info("Called [tellJoke: {}]", userMessage);
         ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
-                .model(ChatModel.GPT_4O_MINI)
+                .model(ChatModel.GPT_6_SOL)
                 .maxCompletionTokens(300)
                 .addSystemMessage(SYSTEM_PROMPT)
                 .addTool(SuggestCategory.class)
+                .putAdditionalBodyProperty(
+                        "reasoning_effort",
+                        JsonValue.from("none")
+                )
                 .addUserMessage(userMessage);
 
         for (int round = 0; round < MAX_TOOL_ROUNDS; round++) {
